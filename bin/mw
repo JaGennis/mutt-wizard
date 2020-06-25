@@ -16,7 +16,7 @@ maildir="$HOME/.local/share/mail"	# Location of mail storage
 namere="^[a-z_][a-z0-9_-]*$"		# Regex to ensure viable username
 emailre=".\+@.\+\\..\+" 		# Regex to confirm valid email address
 muttshare="$prefix/share/mutt-wizard"
-mbsyncrc="$HOME/.mbsyncrc"
+mbsyncrc="$XDG_CONFIG_HOME/mbsyncrc"
 mwconfig="$muttshare/mutt-wizard.muttrc"
 cachedir="$HOME/.cache/mutt-wizard"
 muttrc="$muttdir/muttrc"
@@ -233,7 +233,7 @@ formatShortcut() { \
 	done ;}
 
 tryconnect() { mkdir -p "$maildir/$title"
-	if mailboxes="$(mbsync -l "$title" | sed 's/\//./')" >/dev/null 2>&1 && [ -n "$mailboxes" ]; then
+	if mailboxes="$(mbsync -c $XDG_CONFIG_HOME/mbsyncrc -l "$title" | sed 's/\//./')" >/dev/null 2>&1 && [ -n "$mailboxes" ]; then
 		[ "$accounttype" = "online" ] && sed -ibu "/IMAPStore $title-remote$/,/# End profile/d" "$mbsyncrc" ; rm -f "$mbsyncrc"bu
 		printf "\033[32mMailboxes detected.\033[0m\\n"
 		echo "$mailboxes" | xargs -I {} mkdir -p "$maildir/$title/{}"
@@ -364,6 +364,6 @@ Allowed options:
   all else	Print this message
 
 NOTE: Once at least one account is added, you can run
-\`mbsync -a\` to begin downloading mail.
+\`mbsync -a -c $XDG_CONFIG_HOME/mbsyncrc\` to begin downloading mail.
 EOF
 esac
