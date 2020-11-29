@@ -5,6 +5,7 @@
 # If you want to override any settings, set those in your muttrc.
 set mailcap_path = /usr/local/share/mutt-wizard/mailcap
 set date_format="%d/%m/%y %H:%M"
+set mime_type_query_command = "file --mime-type -b %s"
 set index_format="%2C %Z %?X?A& ? %D %-15.15F %s (%-4.4c)"
 set sort = 'reverse-date'
 set smtp_authenticators = 'gssapi:login'
@@ -22,8 +23,9 @@ set forward_quote		# include message in forwards
 set reverse_name		# reply as whomever it was to
 set include			# include message in replies
 set mail_check=60 # to avoid lags using IMAP with some email providers (yahoo for example)
-auto_view text/html		# automatically show html (mailcap uses w3m)
+auto_view text/html		# automatically show html (mailcap uses lynx)
 auto_view application/pgp-encrypted
+#set display_filter = "tac | sed '/\\\[-- Autoview/,+1d' | tac" # Suppress autoview messages.
 alternative_order text/plain text/enriched text/html
 bind index,pager i noop
 bind index,pager g noop
@@ -70,8 +72,8 @@ bind editor <Tab> complete-query
 
 macro index,pager a "<enter-command>set my_pipe_decode=\$pipe_decode pipe_decode<return><pipe-message>abook --add-email -C $XDG_CONFIG_HOME/abook/abookrc --datafile $XDG_CONFIG_HOME/abook/addressbook<return><enter-command>set pipe_decode=\$my_pipe_decode; unset my_pipe_decode<return>" "add the sender address to abook"
 macro index \Cr "T~U<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" "mark all messages as read"
-macro index O "<shell-escape>mbsync -c $XDG_CONFIG_HOME/mbsyncrc -a<enter>" "run mbsync to sync all mail"
-macro index \Cf "<enter-command>unset wait_key<enter><shell-escape>read x?'Enter a search term to find with notmuch: '; echo \$x >~/.cache/mutt_terms<enter><limit>~i \"\`notmuch search --output=messages \$(cat ~/.cache/mutt_terms) | head -n 600 | perl -le '@a=<>;s/\^id:// for@a;$,=\"|\";print@a' | perl -le '@a=<>; chomp@a; s/\\+/\\\\+/ for@a;print@a' \`\"<enter>" "show only messages matching a notmuch pattern"
+macro index O "<shell-escape>mw -Y<enter>" "run mw -Y to sync all mail"
+macro index \Cf "<enter-command>unset wait_key<enter><shell-escape>printf 'Enter a search term to find with notmuch: '; read x; echo \$x >~/.cache/mutt_terms<enter><limit>~i \"\`notmuch search --output=messages \$(cat ~/.cache/mutt_terms) | head -n 600 | perl -le '@a=<>;s/\^id:// for@a;$,=\"|\";print@a' | perl -le '@a=<>; chomp@a; s/\\+/\\\\+/ for@a;print@a' \`\"<enter>" "show only messages matching a notmuch pattern"
 macro index A "<limit>all\n" "show all messages (undo limit)"
 
 # Sidebar mappings
@@ -80,7 +82,7 @@ set sidebar_width = 20
 set sidebar_short_path = yes
 set sidebar_next_new_wrap = yes
 set mail_check_stats
-set sidebar_format = '%B%?F? [%F]?%* %?N?%N/? %?S?%S?'
+set sidebar_format = '%D%?F? [%F]?%* %?N?%N/? %?S?%S?'
 bind index,pager \Ck sidebar-prev
 bind index,pager \Cj sidebar-next
 bind index,pager \Co sidebar-open

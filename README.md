@@ -27,12 +27,32 @@ User of Arch-based distros can also install mutt-wizard from the AUR as [mutt-wi
 
 The mutt-wizard is run with the command `mw`. Once everything is setup, you'll use `neomutt` to access your mail.
 
-- `mw add` -- add a new email account
-- `mw ls` -- list existing accounts
-- `mw pass` -- revise an account's password
-- `mw delete` -- delete an added account
-- `mw sync` -- sync all mail accounts and update notmuch database
-- `mw purge` -- delete all accounts and settings
+- `mw -a you@email.com` -- add a new email account
+- `mw -l` -- list existing accounts
+- `mw -y your@email.com` -- sync an email account
+- `mw -Y` -- sync all configured email accounts
+- `mw -d` -- choose an account to delete
+- `mw -D your@email.com` -- delete account settings without confirmation
+- `pass edit mw-your@email.com` -- revise an account's password
+
+### Options usable when adding an account
+
+#### Providing arguments
+
+- `-u` -- Give an account username if different from the email address.
+- `-n` -- A real name to be used by the account. Put in quotations if multiple words
+- `-i` -- IMAP server address
+- `-I` -- IMAP server port (otherwise assumed to be 993)
+- `-s` -- SMTP server address
+- `-S` -- SMTP server port (otherwise assumed to be 587)
+- `-m` -- Maximum number of emails to be kept offline. No maximum is default functionality.
+- `-x` -- Account password. You will be prompted for it otherwise.
+
+#### General Settings
+
+- `-p` -- Add a Protonmail account
+- `-f` -- Assume mailbox names and force account configuration without connecting online at all.
+- `-o` -- Configure mutt for an account, but do not keep mail offline.
 
 ## Dependencies
 
@@ -45,10 +65,10 @@ There's a chance of errors if you use a slow-release distro like Ubuntu, Debian 
 
 ### Optional
 
+- `pam-gnupg` - Automatically logs you into your GPG key on login so you will never need to input your password once logged on to your system. Check the repo and directions out [here](https://github.com/cruegge/pam-gnupg).
 - `lynx` - view HTML email in neomutt.
 - `notmuch` - index and search mail. Install it and run `notmuch setup`, tell it that your mail is in `~/.local/share/mail/` (although `mw` will do this automatically if you haven't set notmuch up before). You can run it in mutt with `ctrl-f`. Run `notmuch new` to process new mail.
 - `abook` - a terminal-based address book. Pressing tab while typing an address to send mail to will suggest contacts that are in your abook.
-- `pam-gnupg` - this is a more general program that I use. It automatically logs you into your GPG key on login so you will never need to input your password once logged on to your system. Check the repo and directions out [here](https://github.com/cruegge/pam-gnupg).
 - `urlview` - outputs urls in mail to browser.
 
 ## Neomutt user interface
@@ -68,8 +88,10 @@ To give you an example of the interface, here's an idea:
 - `?` - see all keyboard shortcuts
 - `ctrl-j`/`ctrl-k` - move up and down in sidebar, `ctrl-o` opens mailbox.
 - `ctrl-b` - open a menu to select a url you want to open in you browser.
+-
 ## New stuff and improvements since the original release
 
+- `mw` is now scriptable with command-line options and can run successfully without any interaction, making it possible to deploy in a script.
 - `isync`/`mbsync` has replaced `offlineimap` as the backend. Offlineimap was error-prone, bloated, used obsolete Python 2 modules and required separate steps to install the system.
 - `mw` is now an installed program instead of just a script needed to be kept in your mutt folder.
 - `dialog` is no longer used (le bloat) and the interface is simply text commands.
