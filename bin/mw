@@ -5,7 +5,7 @@ command -V gpg >/dev/null 2>&1 && GPG="gpg" || GPG="gpg2"
 [ -r "$PASSWORD_STORE_DIR/.gpg-id" ] &&
     "$GPG" --list-secret-keys $(cat "$PASSWORD_STORE_DIR/.gpg-id") >/dev/null 2>&1 || {
         printf "\`pass\` must be installed and initialized to encrypt passwords.\\nBe sure it is installed and run \`pass init <yourgpgemail>\`.\\nIf you don't have a GPG public private key pair, run \`%s --full-gen-key\` first.\\n" "$GPG"
-        exit
+        exit 1
     }
 
 prefix="/usr/local"
@@ -237,9 +237,9 @@ Archive" && return 0
 
 finalize() { echo "$mailboxes" | xargs -I {} mkdir -p "$maildir/$fulladdr/{}/cur" "$maildir/$fulladdr/{}/tmp" "$maildir/$fulladdr/{}/new"
 	sed -ibu "/$MARKER/d" "$accdir/$idnum-$fulladdr.muttrc" ; rm -f "$accdir/$idnum-$fulladdr.muttrcbu"
-	toappend="mailboxes $(echo "$mailboxes" | sed "s/^/\"=/;s/$/\"/" | paste -sd ' ' )"
+	toappend="mailboxes $(echo "$mailboxes" | sed "s/^/\"=/;s/$/\"/" | paste -sd ' ' - )"
 	for x in $mailboxes; do
-		case $x in
+		case "$x" in
 			*[Ss][Ee][Nn][Tt]*) setBox record "$x"; formatShortcut s sent "$x" ;;
 			*[Dd][Rr][Aa][Ff][Tt][Ss]*) setBox postponed "$x"; formatShortcut d drafts "$x" ;;
 			*[Tt][Rr][Aa][Ss][Hh]*) formatShortcut t trash "$x"; setBox trash "$x" ;;
@@ -348,7 +348,7 @@ exit 1
 ;;
 esac done
 
-! command -v mbsync >/dev/null && [ -z "${force+x}" ] && printf "\`mbsync (isync package)\` must be installed to run mutt-wizard.\\n" && exit
+! command -v mbsync >/dev/null && [ -z "${force+x}" ] && printf "\`mbsync (isync package)\` must be installed to run mutt-wizard.\\n" && exit 1
 
 case "$action" in
 	list) list ;;
